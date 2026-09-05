@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarkFlow Studio - 现代化 Markdown & Mermaid 流程图实时预览与 PDF 导出</title>
+  <meta name="description" content="极速、高颜值的 Markdown 与 Mermaid 图表实时编辑器，支持代码高亮、精美主题、高保真 PDF 导出与 Vercel 一键部署。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/styles/tokens.css">
+  <link rel="stylesheet" href="./src/styles/base.css">
+  <link rel="stylesheet" href="./src/styles/editor.css">
+  <link rel="stylesheet" href="./src/styles/preview.css">
+  <link rel="stylesheet" href="./src/styles/print.css">
+</head>
+<body>
+  <div id="app" class="app-container">
+    <!-- Top Navigation Bar -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="m9 15 2 2 4-4"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">MarkFlow</span>
+            <span class="brand-badge">Studio</span>
+          </div>
+        </div>
+
+        <div class="doc-title-wrapper">
+          <input type="text" id="documentTitle" class="doc-title-input" value="未命名文档.md" spellcheck="false" title="点击修改文档名称" />
+        </div>
+      </div>
+
+      <div class="header-center">
+        <!-- View Toggle Controls -->
+        <div class="segmented-control" id="viewModeGroup" role="group" aria-label="视图模式">
+          <button type="button" class="segment-btn" data-view="edit" title="仅编辑 (Ctrl+1)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>编辑</span>
+          </button>
+          <button type="button" class="segment-btn active" data-view="split" title="双栏分屏 (Ctrl+2)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><line x1="12" x2="12" y1="3" y2="21"/></svg>
+            <span>双栏</span>
+          </button>
+          <button type="button" class="segment-btn" data-view="preview" title="仅预览 (Ctrl+3)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>预览</span>
+          </button>
+        </div>
+
+        <!-- Sync Scroll Button -->
+        <button type="button" id="btnSyncScroll" class="icon-toggle-btn active" title="同步滚动 (开启/关闭)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3 3 7l4 4"/><path d="M3 7h11a4 4 0 0 1 4 4v1"/><path d="m17 21 4-4-4-4"/><path d="M21 17H10a4 4 0 0 1-4-4v-1"/></svg>
+          <span class="btn-label">同步滚动</span>
+        </button>
+      </div>
+
+      <div class="header-right">
+        <!-- Template Selection Dropdown -->
+        <div class="dropdown-wrapper">
+          <button type="button" class="header-action-btn dropdown-trigger" id="btnTemplates" title="选择内置示例模版">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10"/><path d="M6 10h10"/></svg>
+            <span>示例模板</span>
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="dropdown-menu" id="templatesMenu">
+            <div class="dropdown-header">预设范例</div>
+            <button type="button" class="dropdown-item" data-template="welcome">
+              <span class="item-title">✨ 综合全功能演示</span>
+              <span class="item-desc">包含所有图表、公式、表格与代码</span>
+            </button>
+            <button type="button" class="dropdown-item" data-template="mermaid_gallery">
+              <span class="item-title">📊 Mermaid 图表全集</span>
+              <span class="item-desc">流程图/时序图/甘特图/类图/状态图</span>
+            </button>
+            <button type="button" class="dropdown-item" data-template="tech_spec">
+              <span class="item-title">📐 技术方案设计架构书</span>
+              <span class="item-desc">标准高保真技术文档与架构图模版</span>
+            </button>
+            <button type="button" class="dropdown-item" data-template="api_docs">
+              <span class="item-title">⚡ RESTful API 接口规范</span>
+              <span class="item-desc">接口定义、数据结构与时序图</span>
+            </button>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="dropdown-item text-danger" data-template="clear">
+              <span class="item-title">🗑️ 清空编辑器</span>
+              <span class="item-desc">重置为一个干净的空白文档</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- File Import / Export buttons -->
+        <input type="file" id="fileInput" accept=".md,.markdown,.txt" style="display: none;" />
+        <button type="button" class="header-action-btn" id="btnImport" title="导入 Markdown 文件">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          <span>导入</span>
+        </button>
+
+        <button type="button" class="header-action-btn" id="btnExportMd" title="导出 .md 源文件">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+          <span>导出 MD</span>
+        </button>
+
+        <!-- PDF Export Primary Button -->
+        <div class="dropdown-wrapper">
+          <button type="button" class="btn-primary" id="btnExportPdf" title="高清导出 PDF (支持 html2pdf 或原生打印)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            <span>导出 PDF</span>
+            <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right" id="pdfMenu">
+            <button type="button" class="dropdown-item" id="btnDirectPdf">
+              <span class="item-title">⚡ 一键直接下载 PDF</span>
+              <span class="item-desc">使用客户端引擎快速转为高清 PDF</span>
+            </button>
+            <button type="button" class="dropdown-item" id="btnPrintPdf">
+              <span class="item-title">🖨️ 浏览器高精矢量打印 (推荐)</span>
+              <span class="item-desc">调起系统打印机，可另存为最佳矢量 PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="divider-v"></div>
+
+        <!-- Theme Toggle -->
+        <button type="button" class="icon-btn" id="btnThemeToggle" title="切换深色/浅色模式">
+          <svg class="sun-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="moon-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+
+        <!-- Fullscreen -->
+        <button type="button" class="icon-btn" id="btnFullscreen" title="全屏沉浸模式 (F11)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Formatting Toolbar -->
+    <div class="toolbar-container" id="editorToolbar">
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" data-action="h1" title="一级标题"><b>H1</b></button>
+        <button type="button" class="toolbar-btn" data-action="h2" title="二级标题"><b>H2</b></button>
+        <button type="button" class="toolbar-btn" data-action="h3" title="三级标题"><b>H3</b></button>
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" data-action="bold" title="粗体 (Ctrl+B)"><b>B</b></button>
+        <button type="button" class="toolbar-btn" data-action="italic" title="斜体 (Ctrl+I)"><i>I</i></button>
+        <button type="button" class="toolbar-btn" data-action="strikethrough" title="删除线"><s>S</s></button>
+        <button type="button" class="toolbar-btn" data-action="inline-code" title="行内代码"><code>&lt;&gt;</code></button>
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" data-action="quote" title="引用块">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="ul" title="无序列表">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="ol" title="有序列表">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="task" title="任务清单">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="6" height="6" x="3" y="5" rx="1"/><path d="m3 17 2 2 4-4"/><line x1="13" x2="21" y1="6" y2="6"/><line x1="13" x2="21" y1="12" y2="12"/><line x1="13" x2="21" y1="18" y2="18"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="table" title="插入表格">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+        </button>
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" data-action="codeblock" title="代码块">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="link" title="插入超链接 (Ctrl+K)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </button>
+        <button type="button" class="toolbar-btn" data-action="hr" title="分割线">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+        </button>
+      </div>
+      <div class="toolbar-divider"></div>
+      <!-- Quick Mermaid Inserter -->
+      <div class="toolbar-group">
+        <div class="dropdown-wrapper">
+          <button type="button" class="toolbar-btn toolbar-btn-highlight dropdown-trigger" id="btnMermaidMenu" title="插入 Mermaid 流程图/图表">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>+ Mermaid 图表</span>
+            <svg class="chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="dropdown-menu" id="mermaidDropdown">
+            <div class="dropdown-header">选择图表类型</div>
+            <button type="button" class="dropdown-item" data-mermaid="flowchart">
+              <span class="item-title">🔀 业务流程图 (Flowchart)</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="sequence">
+              <span class="item-title">⏱️ 系统时序交互图 (Sequence)</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="class">
+              <span class="item-title">📦 类与架构图 (Class Diagram)</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="state">
+              <span class="item-title">🔄 状态机模型 (State Diagram)</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="er">
+              <span class="item-title">🗄️ 数据库 ER 实体关系图</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="gantt">
+              <span class="item-title">📅 项目规划甘特图 (Gantt)</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="pie">
+              <span class="item-title">🥧 占比饼状图 (Pie Chart)</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="gitgraph">
+              <span class="item-title">🌿 Git 分支流转图 (GitGraph)</span>
+            </button>
+            <button type="button" class="dropdown-item" data-mermaid="mindmap">
+              <span class="item-title">🧠 逻辑思维导图 (Mindmap)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar-spacer"></div>
+
+      <!-- Quick Copy Actions -->
+      <div class="toolbar-group">
+        <button type="button" class="toolbar-btn" id="btnCopyHtml" title="复制渲染后的 HTML">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <span>复制 HTML</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Workspace (Editor + Splitter + Preview) -->
+    <main class="workspace-layout" id="workspace">
+      <!-- Left Editor Pane -->
+      <section class="pane pane-editor" id="paneEditor">
+        <div class="pane-header">
+          <div class="pane-header-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+            <span>MARKDOWN 编辑器</span>
+          </div>
+          <div class="pane-header-actions">
+            <span class="save-status" id="saveIndicator">已同步</span>
+          </div>
+        </div>
+        <div class="editor-body">
+          <div class="line-numbers" id="lineNumbers">1</div>
+          <textarea id="markdownInput" class="markdown-textarea" placeholder="在此输入 Markdown 内容，支持快捷键及实时 Mermaid 流程图..." spellcheck="false"></textarea>
+        </div>
+      </section>
+
+      <!-- Drag Resizer -->
+      <div class="pane-resizer" id="paneResizer" title="左右拖动调整宽度">
+        <div class="resizer-handle"></div>
+      </div>
+
+      <!-- Right Preview Pane -->
+      <section class="pane pane-preview" id="panePreview">
+        <div class="pane-header">
+          <div class="pane-header-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>实时渲染预览</span>
+          </div>
+          <div class="pane-header-actions">
+            <div id="mermaidBadge" class="badge-status badge-success">
+              <span class="status-dot"></span>
+              <span class="status-text">Mermaid 就绪</span>
+            </div>
+          </div>
+        </div>
+        <div class="preview-scroll-wrapper" id="previewContainer">
+          <article class="markdown-body" id="previewOutput">
+            <!-- Rendered Markdown HTML will be injected here -->
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Status Bar -->
+    <footer class="app-statusbar">
+      <div class="statusbar-left">
+        <div class="status-item">
+          <span class="status-label">字数:</span>
+          <span class="status-value" id="statWords">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">字符:</span>
+          <span class="status-value" id="statChars">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">行数:</span>
+          <span class="status-value" id="statLines">1</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">预计阅读:</span>
+          <span class="status-value" id="statReadingTime">1 分钟</span>
+        </div>
+      </div>
+      <div class="statusbar-right">
+        <div class="status-item">
+          <span class="status-label">编码:</span>
+          <span class="status-value">UTF-8</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">渲染引擎:</span>
+          <span class="status-value">Marked + Mermaid.js</span>
+        </div>
+        <div class="status-item status-tip" title="支持自动保存至浏览器 LocalStorage">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          <span>自动持久化</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast Message Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Main Application Script Entry -->
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

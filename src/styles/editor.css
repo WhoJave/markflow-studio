@@ -1,0 +1,232 @@
+/* Toolbar */
+.toolbar-container {
+  height: var(--toolbar-height);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 6px;
+  overflow-x: auto;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.toolbar-container::-webkit-scrollbar {
+  height: 2px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.toolbar-btn {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 6px;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: all var(--transition-fast);
+}
+
+.toolbar-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+
+.toolbar-btn:active {
+  background: var(--bg-active);
+}
+
+.toolbar-btn-highlight {
+  background: var(--primary-subtle);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: var(--primary);
+  font-weight: 600;
+  gap: 4px;
+}
+
+.toolbar-btn-highlight:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border-color);
+  margin: 0 4px;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+/* Workspace Layout */
+.workspace-layout {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-app);
+}
+
+/* Panes */
+.pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.pane-editor {
+  flex: 1 1 50%;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+
+.pane-preview {
+  flex: 1 1 50%;
+  background: var(--bg-app);
+}
+
+/* Pane Header */
+.pane-header {
+  height: 32px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.pane-header-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.save-status {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  transition: color var(--transition-fast);
+}
+
+.save-status.unsaved {
+  color: var(--accent-amber);
+}
+
+/* Editor Body */
+.editor-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  font-family: var(--font-mono);
+}
+
+.line-numbers {
+  width: 46px;
+  padding: 16px 8px 16px 0;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  user-select: none;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  overflow: hidden;
+  opacity: 0.55;
+}
+
+.markdown-textarea {
+  flex: 1;
+  height: 100%;
+  padding: 16px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  border: none;
+  outline: none;
+  resize: none;
+  tab-size: 2;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-y: auto;
+}
+
+.markdown-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* Resizer Divider */
+.pane-resizer {
+  width: 8px;
+  margin: 0 -4px;
+  background: transparent;
+  cursor: col-resize;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+
+.pane-resizer:hover, .pane-resizer.resizing {
+  background: var(--primary-glow);
+}
+
+.resizer-handle {
+  width: 3px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.pane-resizer:hover .resizer-handle, .pane-resizer.resizing .resizer-handle {
+  background: var(--primary);
+  height: 36px;
+}
+
+/* View Mode states */
+.workspace-layout.mode-edit .pane-editor {
+  flex: 1 1 100%;
+  border-right: none;
+}
+.workspace-layout.mode-edit .pane-preview,
+.workspace-layout.mode-edit .pane-resizer {
+  display: none !important;
+}
+
+.workspace-layout.mode-preview .pane-preview {
+  flex: 1 1 100%;
+}
+.workspace-layout.mode-preview .pane-editor,
+.workspace-layout.mode-preview .pane-resizer {
+  display: none !important;
+}

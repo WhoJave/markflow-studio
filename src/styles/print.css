@@ -1,0 +1,145 @@
+/* Print & PDF Export Specialized Styles */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 16mm 14mm;
+  }
+
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt;
+  }
+
+  /* Hide app UI chrome */
+  .app-header,
+  .toolbar-container,
+  .pane-editor,
+  .pane-resizer,
+  .app-statusbar,
+  .toast-container,
+  .pane-header,
+  .code-copy-btn,
+  .window-dots {
+    display: none !important;
+  }
+
+  .app-container,
+  .workspace-layout,
+  .pane-preview,
+  .preview-scroll-wrapper {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  .markdown-body {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #0f172a !important;
+  }
+
+  /* Printing Typography & Headings */
+  .markdown-body h1 {
+    color: #0f172a !important;
+    background: none !important;
+    -webkit-text-fill-color: #0f172a !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Prevent awkward page cutoffs */
+  .markdown-body p,
+  .markdown-body blockquote,
+  .markdown-body ul,
+  .markdown-body ol {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .code-block-wrapper,
+  .mermaid-wrapper,
+  table,
+  tr,
+  blockquote {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Ensure color reproduction */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Table styling in print */
+  .markdown-body table {
+    border: 1px solid #cbd5e1 !important;
+    background: #ffffff !important;
+  }
+
+  .markdown-body th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+
+  .markdown-body th,
+  .markdown-body td {
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  /* Code block styling in print */
+  .code-block-wrapper {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+  }
+
+  .code-block-header {
+    background: #f1f5f9 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  .code-lang {
+    color: #475569 !important;
+  }
+
+  .markdown-body pre code {
+    color: #0f172a !important;
+  }
+
+  /* Mermaid Chart in print */
+  .mermaid-wrapper {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    padding: 16px !important;
+    margin: 1.5em 0 !important;
+  }
+
+  .mermaid-wrapper svg {
+    max-width: 100% !important;
+  }
+
+  /* Links in print */
+  .markdown-body a {
+    color: #2563eb !important;
+    text-decoration: underline !important;
+    border-bottom: none !important;
+  }
+}

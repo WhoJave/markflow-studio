@@ -2,7 +2,7 @@
 
 > 现代化、高颜值的 Markdown 与 Mermaid 流程图实时编辑器，支持双栏同步滚动、语法高亮、多种图表渲染、高保真 PDF 导出与 Vercel 一键部署。
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FWhoJave%2Fmarkflow-studio)
 
 ---
 
